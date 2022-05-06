@@ -1,0 +1,26 @@
+body {
+    background-color: #212529;
+    color: #fff;
+}
+
+h1 {
+    font-size: 3em;
+    margin: 40px
+}
+
+h2 {
+    font-size: 2em;
+    margin: 20px 0;
+}
+
+div {
+    margin: 20px 0;
+}
+
+p.alert-info, p.alert-danger {
+    padding: 10px;
+}
+
+p.alert-danger {
+    display: none;
+}
