@@ -17,11 +17,11 @@ div {
     margin: 20px 0;
 }
 
-p.alert-info, p.alert-danger {
+/*p.alert-info, p.alert-danger {
     padding: 10px;
-}
+}*/
 
-p.alert-danger {
+p.alert-danger, p.alert-success {
     display: none;
 }
 

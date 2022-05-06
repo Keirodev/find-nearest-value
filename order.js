@@ -7,13 +7,15 @@ Testing Data
 190910-Brahms34
 140910-Pac
 
+
  */
 
 
 document.getElementById('submit').addEventListener('click', event => {
   // avoid native submit page reload
   event.preventDefault()
-  toggleDisplayError()
+  toggleDisplayInfo(null, 'alert-danger')
+  toggleDisplayInfo(null, 'alert-success')
 
   // check if both fields are filled (target & values)
   const target = Number(document.getElementById('target').value)
@@ -21,7 +23,7 @@ document.getElementById('submit').addEventListener('click', event => {
 
   if (target === 0 || isNaN(target) || values === '') {
     // erreur
-    toggleDisplayError('Champs remplis incorrectement')
+    toggleDisplayInfo('Champs remplis incorrectement', 'alert-danger')
     return;
   }
 
@@ -64,24 +66,34 @@ document.getElementById('submit').addEventListener('click', event => {
 
   document.getElementById('results').innerHTML = domResults.join('');
 
+  // format data for clipboard
+  const resultForClipboard = results.map((result, index) => {
+    return `${index + 1} : ${result.name} avec ${result.score} (≠ de ${result.delta})`
+  }).join('\n')
+
+  // copy to clipboard
+  navigator.clipboard.writeText(resultForClipboard);
+  toggleDisplayInfo('Résultats copié dans ton press-papier', 'alert-success')
+
+
 })
 
-
-function toggleDisplayError(message) {
-  const errorDiv = document.getElementById('alert-danger')
+function toggleDisplayInfo(message, classname) {
+  const divWanted = document.getElementById(classname)
 
   if (!!!message) {
     // hide
-    errorDiv.style.display = 'none'
-    errorDiv.innerText = ''
+    divWanted.style.display = 'none'
+    divWanted.innerText = ''
   } else {
     //display
-    errorDiv.style.display = 'block'
-    errorDiv.innerText = message
+    divWanted.style.display = 'block'
+    divWanted.innerText = message
   }
 
 
 }
 
 
-// TODO : btm poun copier  / coller ler résultats finaux.
+
+// TODO : input pour les gains
