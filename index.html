@@ -17,18 +17,25 @@
         <h1>Classe tes données bro'</h1>
         <h2>De la valeur la plus proche à la plus éloignée</h2>
     </div>
-    <div class="row">touch .gitignore
+    <div class="row">
         <label for="target">Valeur cible :</label>
         <input type="text" id="target">
     </div>
     <div class="row">
         <label for="values">Pose tes valeurs ici.</label>
-        <p class="alert-info">Sous la forme : 0000-Pseudo, ou juste 0000 si tu ne souhaite pas les étiquetter</p>
+        <p class="alert-info">Sous la forme : 0000-Pseudo (sinon ça ne sera pas pris en compte)</p>
         <textarea id="values" rows="8"></textarea>
         <button id="submit" type="submit" class="btn btn-primary">Trier</button>
     </div>
     <p id="alert-danger" class="alert-danger"></p>
-    <div class="row" id="results"></div>
+    <div class="row" id="results">
+
+        <div class="col-3">épopéo</div>
+        <div class="col-3">épopéo</div>
+        <div class="col-3">épo</div>
+        <div class="col-3">époéopéo</div>
+
+    </div>
 </div>
 
 <script src="order.js"></script>

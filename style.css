@@ -24,3 +24,7 @@ p.alert-info, p.alert-danger {
 p.alert-danger {
     display: none;
 }
+
+#results > .row {
+    border-bottom: 2px solid grey;
+}
