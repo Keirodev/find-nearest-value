@@ -1,17 +1,6 @@
-/*
-
-Testing Data
-
-2332-Spike
-232-Nico
-190910-Brahms34
-140910-Pac
-
-*/
-
 const textAreas = document.getElementsByTagName('textarea');
 
-Array.prototype.forEach.call(textAreas, function(elem) {
+Array.prototype.forEach.call(textAreas, function (elem) {
   elem.placeholder = elem.placeholder.replace(/\\n/g, '\n');
 });
 
@@ -27,6 +16,8 @@ function processValues(values, targetValue) {
       return {score: Number(score), name}
     })
 
+  console.log(splitedValue)
+
   // now let's order
   cleanedValue.sort((a, b) => Math.abs(targetValue - Number(a.score)) - Math.abs(targetValue - Number(b.score)))
   // add ≠ to targetValue
@@ -40,7 +31,6 @@ function processValues(values, targetValue) {
   // add rewards
   const rewardsRaw = document.getElementById('rewards').value
   const rewardsSplitted = rewardsRaw.split(/\n/g)
-  console.log('rewardsSplitted', rewardsSplitted)
   // add each reward line to the ordered value lists
   results.forEach(result => {
     result.reward = rewardsSplitted.length ? rewardsSplitted.shift() : false
@@ -69,10 +59,15 @@ function addResultsToDom(data) {
   document.getElementById('results').innerHTML = domResults.join('');
 }
 
-function copyResultToClipboard(data) {
+function copyResultToClipboard(target, data) {
+  data.unshift(`Cible : ${target}\n`)
   const resultForClipboard = data.map((result, index) => {
+
+    if (index === 0) return result
+
     const rewardFormatted = result.reward ? ` Gain : ${result.reward}` : ''
-    return `${index + 1} : ${result.name} avec ${result.score} (≠ de ${result.delta})${rewardFormatted}`
+    return `${index} : ${result.name} avec ${result.score} (≠ de ${result.delta})${rewardFormatted}`
+
   }).join('\n')
 
   // copy to clipboard
@@ -101,10 +96,11 @@ document.getElementById('submit').addEventListener('click', event => {
   // extract values as 0000-xxxx
   const valuesFormatted = processValues(values, target)
 
+  console.log(valuesFormatted)
   // add results to dom
   addResultsToDom(valuesFormatted)
   // format data for clipboard
-  copyResultToClipboard(valuesFormatted)
+  copyResultToClipboard(target, valuesFormatted)
 
 
 })
@@ -124,3 +120,23 @@ function toggleDisplayInfo(message, classname) {
 
 
 }
+
+
+/*
+
+Mock for localhost
+
+*/
+function addMock() {
+  const target = '1175'
+  const values = `4196-Pac 6512-Hono 3814-Minou 8765-Spike 8500-Cheyenne 7988-Toffy 25000-Brave 3333-Cerraand 5000-Masuya 3281-Nico 3245-Valhala 180-Poponews 350-Bau 350-Png 700-CLIO 1400-BRAHMS`
+  const rewards = `2000\r\n1000\r\n500\r\n250\r\n125\r\n75\r\n50`
+
+
+  document.getElementById('target').value = target
+  document.getElementById('values').innerText = values
+  document.getElementById('rewards').value = rewards
+}
+
+if (window.location.host.indexOf('localhost') >= 0) addMock()
+
