@@ -13,13 +13,14 @@ h2 {
     margin: 20px 0;
 }
 
-div {
+.form-group {
     margin: 20px 0;
 }
 
-/*p.alert-info, p.alert-danger {
-    padding: 10px;
-}*/
+.input-group-text {
+    height: 100%;
+    color: #35ad14;
+}
 
 p.alert-danger, p.alert-success {
     display: none;
