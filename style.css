@@ -29,3 +29,15 @@ p.alert-danger, p.alert-success {
 #results > .row {
     border-bottom: 2px solid grey;
 }
+
+.position-1 {
+    color: gold;
+}
+
+.position-2 {
+    color: silver;
+}
+
+.position-3 {
+    color: #CD7F32;
+}

@@ -1,22 +1,25 @@
-const textAreas = document.getElementsByTagName('textarea');
-
-Array.prototype.forEach.call(textAreas, function (elem) {
+// Allow multilines thru programmation for textarea simulating an edit
+Array.prototype.forEach.call(document.getElementsByTagName('textarea'), function (elem) {
   elem.placeholder = elem.placeholder.replace(/\\n/g, '\n');
 });
 
+/**
+ * Main process that format values, enrich final result and assiqn rewards
+ * @param values
+ * @param targetValue
+ * @return {(*&{delta: number})[]}
+ */
 function processValues(values, targetValue) {
 
   const regexp = /([0-9]{1,10}-[A-zÀ-ú0-9]+)/g
-  const splitedValue = values.split(regexp)
-  const cleanedValue = splitedValue
+  const valuesExtracted = values.split(regexp)
+  const cleanedValue = valuesExtracted
     .filter(value => regexp.test(value))
     .map(value => {
       let score, name;
       [score, name] = value.split('-')
       return {score: Number(score), name}
     })
-
-  console.log(splitedValue)
 
   // now let's order
   cleanedValue.sort((a, b) => Math.abs(targetValue - Number(a.score)) - Math.abs(targetValue - Number(b.score)))
@@ -28,21 +31,41 @@ function processValues(values, targetValue) {
     }
   })
 
-  // add rewards
+  // add position and rewards
   const rewardsRaw = document.getElementById('rewards').value
   const rewardsSplitted = rewardsRaw.split(/\n/g)
   // add each reward line to the ordered value lists
+  let previousResult
+  let position = 1;
   results.forEach(result => {
-    result.reward = rewardsSplitted.length ? rewardsSplitted.shift() : false
+    // same score ? => same reward and same position
+    if (previousResult !== undefined && result.score === previousResult.score) {
+      position--
+      result.position = position
+      result.reward = previousResult.reward
+    } else {
+      result.position = position
+      result.reward = rewardsSplitted.length ? rewardsSplitted.shift() : false
+    }
+
+    position++
+    previousResult = result
   })
 
   return results
 }
 
+
+function generatePositionContent(position) {
+  return (position < 4)
+    ? `<i class="fa-solid fa-star position-${position}"></i>`.repeat(position)
+    : position
+}
+
 function addResultsToDom(data) {
-  const domResults = data.map((result, index) => `
+  const domResults = data.map(result => `
         <div class="row">
-          <div class="col-3">${index + 1}</div>
+          <div class="col-3">${generatePositionContent(result.position)}</div>
           <div class="col-3">${result.name}</div>
           <div class="col-3">${result.score} (≠ ${result.delta})</div>
           <div class="col-3">${result.reward ? result.reward : ''}</div>
