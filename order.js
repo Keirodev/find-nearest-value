@@ -1,8 +1,3 @@
-// Allow multilines thru programmation for textarea simulating an edit
-Array.prototype.forEach.call(document.getElementsByTagName('textarea'), function (elem) {
-  elem.placeholder = elem.placeholder.replace(/\\n/g, '\n');
-});
-
 /**
  * Main process that format values, enrich final result and assiqn rewards
  * @param values
@@ -55,7 +50,6 @@ function processValues(values, targetValue) {
   return results
 }
 
-
 function generatePositionContent(position) {
   return (position < 4)
     ? `<i class="fa-solid fa-star position-${position}"></i>`.repeat(position)
@@ -98,6 +92,33 @@ function copyResultToClipboard(target, data) {
   toggleDisplayInfo('Résultats copiés dans ton presse-papier', 'alert-success')
 }
 
+function toggleDisplayInfo(message, classname) {
+  const divWanted = document.getElementById(classname)
+
+  if (!!!message) {
+    // hide
+    divWanted.style.display = 'none'
+    divWanted.innerText = ''
+  } else {
+    //display
+    divWanted.style.display = 'block'
+    divWanted.innerText = message
+  }
+}
+
+// save automatically fields to localstorage if edited
+const fieldsIdToRecord = ['target', 'values', 'rewards']
+fieldsIdToRecord.forEach(id => {
+  const tag = document.getElementById(id)
+  tag.addEventListener('input', () => localStorage.setItem(id, tag.value))
+})
+
+// load content stored in localstorage
+fieldsIdToRecord.forEach(id => {
+  const dataFromLocalstorage = localStorage.getItem(id)
+  if (dataFromLocalstorage) document.getElementById(id).value = dataFromLocalstorage
+})
+
 document.getElementById('submit').addEventListener('click', event => {
   // avoid native submit page reload
   event.preventDefault()
@@ -118,8 +139,6 @@ document.getElementById('submit').addEventListener('click', event => {
 
   // extract values as 0000-xxxx
   const valuesFormatted = processValues(values, target)
-
-  console.log(valuesFormatted)
   // add results to dom
   addResultsToDom(valuesFormatted)
   // format data for clipboard
@@ -128,21 +147,10 @@ document.getElementById('submit').addEventListener('click', event => {
 
 })
 
-function toggleDisplayInfo(message, classname) {
-  const divWanted = document.getElementById(classname)
-
-  if (!!!message) {
-    // hide
-    divWanted.style.display = 'none'
-    divWanted.innerText = ''
-  } else {
-    //display
-    divWanted.style.display = 'block'
-    divWanted.innerText = message
-  }
-
-
-}
+// Allow multilines thru programmation for textarea simulating an edit
+Array.prototype.forEach.call(document.getElementsByTagName('textarea'), function (elem) {
+  elem.placeholder = elem.placeholder.replace(/\\n/g, '\n');
+});
 
 
 /*
@@ -150,6 +158,7 @@ function toggleDisplayInfo(message, classname) {
 Mock for localhost
 
 */
+
 function addMock() {
   const target = '1175'
   const values = `4196-Pac 6512-Hono 3814-Minou 8765-Spike 8500-Cheyenne 7988-Toffy 25000-Brave 3333-Cerraand 5000-Masuya 3281-Nico 3245-Valhala 180-Poponews 350-Bau 350-Png 700-CLIO 1400-BRAHMS`
@@ -162,4 +171,3 @@ function addMock() {
 }
 
 if (window.location.host.indexOf('localhost') >= 0) addMock()
-
