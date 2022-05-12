@@ -1,3 +1,8 @@
+const mandatoryFieldsId = ['target', 'values']
+const mandatoryFieldsStatus = [{id: 'target', valid: false}, {id: 'values', valid: false}]
+const fieldsIdToRecord = ['target', 'values', 'rewards']
+const valuesRegexp = /([0-9]{1,10}-[A-zÀ-ú0-9]+)/g
+
 /**
  * Main process that format values, enrich final result and assiqn rewards
  * @param values
@@ -90,6 +95,7 @@ function copyResultToClipboard(target, data) {
   // copy to clipboard
   navigator.clipboard.writeText(resultForClipboard);
   toggleDisplayInfo('Résultats copiés dans ton presse-papier', 'alert-success')
+  setTimeout(() => toggleDisplayInfo(null, 'alert-success'), 4000)
 }
 
 function toggleDisplayInfo(message, classname) {
@@ -106,19 +112,62 @@ function toggleDisplayInfo(message, classname) {
   }
 }
 
-// save automatically fields to localstorage if edited
-const fieldsIdToRecord = ['target', 'values', 'rewards']
-fieldsIdToRecord.forEach(id => {
+function isFieldValid(id) {
+  const tagElement = document.getElementById(id)
+  let result;
+
+  switch (id) {
+    case 'target':
+      const regexp = /^\d{1,12}$/
+      result = regexp.test(tagElement.value)
+      break;
+
+    case 'values':
+      const valuesExtracted = tagElement.value.split(valuesRegexp)
+      const cleanedValue = valuesExtracted.filter(value => valuesRegexp.test(value))
+      result = cleanedValue.length > 0
+      break;
+
+    default:
+      return false
+  }
+
+  if (result) {
+    toggleDisplayInfo(null, 'alert-danger')
+    tagElement.classList.add('is-valid')
+    tagElement.classList.remove('is-invalid')
+  } else {
+    toggleDisplayInfo('Champs obligatoires incorrectement remplis', 'alert-danger')
+    tagElement.classList.add('is-invalid')
+    tagElement.classList.remove('is-valid')
+  }
+
+  return result
+}
+
+// Listeners on mandatory fields. If incorrect, Submit button is deactivate
+function toggleSubmitButton() {
+  const areAllMandatoryFieldsValid = mandatoryFieldsStatus.filter(field => field.valid === true).length === mandatoryFieldsStatus.length
+  const submitButton = document.getElementById('submit')
+
+  // if all fields are valid, we can activate the button
+  if (areAllMandatoryFieldsValid) submitButton.removeAttribute('disabled')
+  // otherwise we disable it
+  else submitButton.setAttribute('disabled', '')
+}
+
+function setLocalStorageAndToggleButton(id, firstRun = false) {
   const tag = document.getElementById(id)
-  tag.addEventListener('input', () => localStorage.setItem(id, tag.value))
-})
+  //store all fields to localstorage
+  localStorage.setItem(id, tag.value)
+  // check validity of mandatory fields
+  if (mandatoryFieldsId.includes(id)) {
+    if (!firstRun) mandatoryFieldsStatus.find(field => field.id === id).valid = isFieldValid(id)
+    toggleSubmitButton()
+  }
+}
 
-// load content stored in localstorage
-fieldsIdToRecord.forEach(id => {
-  const dataFromLocalstorage = localStorage.getItem(id)
-  if (dataFromLocalstorage) document.getElementById(id).value = dataFromLocalstorage
-})
-
+// handle clic on submit form button
 document.getElementById('submit').addEventListener('click', event => {
   // avoid native submit page reload
   event.preventDefault()
@@ -131,19 +180,12 @@ document.getElementById('submit').addEventListener('click', event => {
   const target = Number(document.getElementById('target').value)
   const values = document.getElementById('values').value
 
-  if (target === 0 || isNaN(target) || values === '') {
-    // erreur
-    toggleDisplayInfo('Champs remplis incorrectement', 'alert-danger')
-    return;
-  }
-
   // extract values as 0000-xxxx
   const valuesFormatted = processValues(values, target)
   // add results to dom
   addResultsToDom(valuesFormatted)
   // format data for clipboard
   copyResultToClipboard(target, valuesFormatted)
-
 
 })
 
@@ -152,13 +194,24 @@ Array.prototype.forEach.call(document.getElementsByTagName('textarea'), function
   elem.placeholder = elem.placeholder.replace(/\\n/g, '\n');
 });
 
+fieldsIdToRecord.forEach(id => {
+  // load content stored in localstorage
+  const dataFromLocalstorage = localStorage.getItem(id)
+  if (dataFromLocalstorage) document.getElementById(id).value = dataFromLocalstorage
+
+  setLocalStorageAndToggleButton(id, true) // check button status on first run
+
+  // listener to  save automatically fields to localstorage if edited
+  document.getElementById(id).addEventListener('input', () => setLocalStorageAndToggleButton(id))
+})
+
 
 /*
 
 Mock for localhost
 
 */
-
+/*
 function addMock() {
   const target = '1175'
   const values = `4196-Pac 6512-Hono 3814-Minou 8765-Spike 8500-Cheyenne 7988-Toffy 25000-Brave 3333-Cerraand 5000-Masuya 3281-Nico 3245-Valhala 180-Poponews 350-Bau 350-Png 700-CLIO 1400-BRAHMS`
@@ -171,3 +224,4 @@ function addMock() {
 }
 
 if (window.location.host.indexOf('localhost') >= 0) addMock()
+*/
