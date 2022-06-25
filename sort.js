@@ -157,12 +157,11 @@ function toggleSubmitButton() {
 }
 
 function setLocalStorageAndToggleButton(id, firstRun = false) {
-  const tag = document.getElementById(id)
   //store all fields to localstorage
-  localStorage.setItem(id, tag.value)
+  localStorage.setItem(id, document.getElementById(id).value)
   // check validity of mandatory fields
   if (mandatoryFieldsId.includes(id)) {
-    if (!firstRun) mandatoryFieldsStatus.find(field => field.id === id).valid = isFieldValid(id)
+    mandatoryFieldsStatus.find(field => field.id === id).valid = isFieldValid(id)
     toggleSubmitButton()
   }
 }
