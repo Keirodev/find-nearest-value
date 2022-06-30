@@ -61,15 +61,22 @@ function generatePositionContent(position) {
     : position
 }
 
-function addResultsToDom(data) {
-  const domResults = data.map(result => `
-        <div class="row">
+function addResultsToDom(target, data) {
+
+  const domResults = data.map(result => {
+
+    const resultWithSpaces = result.delta.toLocaleString()
+    const formatDelta = result.score > target ? `> de ${resultWithSpaces}`
+      : result.score < target ? `< de ${resultWithSpaces}`
+        : `valeur exacte !`
+
+    return `<div class="row">
           <div class="col-3">${generatePositionContent(result.position)}</div>
           <div class="col-3">${result.name}</div>
-          <div class="col-3">${result.score} (≠ ${result.delta})</div>
+          <div class="col-3">${result.score.toLocaleString()} (${formatDelta})</div>
           <div class="col-3">${result.reward ? result.reward : ''}</div>
-        </div>
-    `)
+        </div>`
+  })
 
   domResults.unshift(`<div class="row">
           <div class="col-3">Position</div>
@@ -82,13 +89,17 @@ function addResultsToDom(data) {
 }
 
 function copyResultToClipboard(target, data) {
-  data.unshift(`Cible : ${target}\n`)
+  data.unshift(`Cible : ${target.toLocaleString()}\n`)
   const resultForClipboard = data.map((result, index) => {
 
     if (index === 0) return result
 
+    const resultWithSpaces = result.delta.toLocaleString()
+    const formatDelta = result.score > target ? `> de ${resultWithSpaces}`
+      : result.score < target ? `< de ${resultWithSpaces}`
+        : `valeur exacte !`
     const rewardFormatted = result.reward ? ` Gain : ${result.reward}` : ''
-    return `${index} : ${result.name} avec ${result.score} (≠ de ${result.delta})${rewardFormatted}`
+    return `${index} : ${result.name} avec ${result.score.toLocaleString()} (${formatDelta})${rewardFormatted}`
 
   }).join('\n')
 
@@ -182,7 +193,7 @@ document.getElementById('submit').addEventListener('click', event => {
   // extract values as 0000-xxxx
   const valuesFormatted = processValues(values, target)
   // add results to dom
-  addResultsToDom(valuesFormatted)
+  addResultsToDom(target, valuesFormatted)
   // format data for clipboard
   copyResultToClipboard(target, valuesFormatted)
 
